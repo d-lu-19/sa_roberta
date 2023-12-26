@@ -1,4 +1,4 @@
-package org.jetbrains.plugins.template
+package com.github.dlu19.saroberta
 
 import com.intellij.DynamicBundle
 import org.jetbrains.annotations.NonNls
