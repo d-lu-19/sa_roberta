@@ -1,8 +1,14 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
+import org.gradle.api.tasks.Copy
+import org.gradle.kotlin.dsl.register
+import org.jetbrains.kotlin.config.JVMConfigurationKeys.IR
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+
 
 fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
+
 
 plugins {
     id("java") // Java support
@@ -13,18 +19,43 @@ plugins {
     alias(libs.plugins.kover) // Gradle Kover Plugin
 }
 
+
 group = properties("pluginGroup").get()
 version = properties("pluginVersion").get()
+
+
+sourceSets {
+    val main by getting {
+        kotlin.srcDir("src/main/kotlin")
+        resources.srcDir("src/main/resources")
+    }
+}
 
 // Configure project's dependencies
 repositories {
     mavenCentral()
 }
 
+repositories {
+    maven {
+        url = uri("https://packages.jetbrains.team/maven/p/ki/maven")
+    }
+}
+
+repositories {
+    maven {
+        url = uri("https://packages.jetbrains.team/maven/p/grazi/grazie-platform-public")
+    }
+}
+
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
-//    implementation(libs.annotations)
+    implementation("io.kinference", "inference-ort", "0.2.16")
 }
+
+//dependencies {
+//    implementation("cloud.genesys:roberta-tokenizer:1.0.6")
+//}
 
 // Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.
 kotlin {
@@ -34,6 +65,10 @@ kotlin {
         vendor = JvmVendorSpec.JETBRAINS
     }
 }
+
+
+
+
 
 // Configure Gradle IntelliJ Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
@@ -67,6 +102,7 @@ koverReport {
         }
     }
 }
+
 
 tasks {
     wrapper {
@@ -104,6 +140,11 @@ tasks {
             }
         }
     }
+
+    project.tasks.named("processResources", Copy::class.java) {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
 
     // Configure UI tests plugin
     // Read more: https://github.com/JetBrains/intellij-ui-test-robot
