@@ -48,7 +48,7 @@ class Analyzer : CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
         // Perform the prediction within a coroutine context
         return runBlocking {
-//            required input is ORTData
+//            required to be input is ORTData
             val result = loadedModel.predict(inputList)
 
             result
