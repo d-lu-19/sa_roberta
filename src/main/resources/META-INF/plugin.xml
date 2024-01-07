@@ -8,11 +8,25 @@
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
+    <actions>
+        <action id="SentimentAnalysis"
+                class="com.github.dlu19.saroberta.actions.SentimentAnalysisAction"
+                text="Analyze Sentiment"
+                description="Analyze sentiment of Kotlin comments">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="MainToolBar" anchor="last"/>
+        </action>
+    </actions>
+
+
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.dlu19.saroberta.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+        <toolWindow factoryClass="com.github.dlu19.saroberta.toolWindow.SAToolWindowFactory"
+                    id="SentimentAnalysisWindow"
+                    anchor="right" secondary="false"/>
     </extensions>
 
-    <applicationListeners>
-        <listener class="com.github.dlu19.saroberta.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>
-    </applicationListeners>
+<!--    <applicationListeners>-->
+<!--        <listener class="com.github.dlu19.saroberta.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>-->
+<!--    </applicationListeners>-->
+
 </idea-plugin>
