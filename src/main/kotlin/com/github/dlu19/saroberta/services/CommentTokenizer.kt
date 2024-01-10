@@ -33,7 +33,8 @@ class Tokenizer() {
 
     fun commentTokenizer(comment: String): LongArray {
         println("Processing comment: $comment")
-        val token: LongArray = robertaTokenizer.tokenize(comment)
+//        val token: List<Int> = robertaTokenizer.tokenize(comment).map{ it.toInt() }
+        val token = robertaTokenizer.tokenize(comment)
         return token
     }
 }

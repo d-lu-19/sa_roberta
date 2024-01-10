@@ -8,6 +8,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.io.toNioPath
@@ -99,7 +100,13 @@ class SAToolWindowFactory : ToolWindowFactory {
 
                 // Perform Sentiment Analysis actions with the selected files
                 if (confirmation == Messages.OK) {
-                    // Call the SentimentAnalysisAction.kt here or perform sentiment analysis as needed
+                    val fileEditorManager = FileEditorManager.getInstance(project)
+                    for (file in selectedFiles) {
+                        val virtualFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file)
+                        if (virtualFile != null) {
+                            fileEditorManager.openFile(virtualFile, true)
+                        }
+                    }
 
                     val sentimentAnalysisAction = SentimentAnalysisAction()
                     val event = AnActionEvent.createFromDataContext(

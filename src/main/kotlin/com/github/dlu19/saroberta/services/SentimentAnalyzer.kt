@@ -1,68 +1,75 @@
 package com.github.dlu19.saroberta.services
 
-import com.github.weisj.jsvg.T
+import ai.onnxruntime.OnnxTensor
+import ai.onnxruntime.OrtEnvironment
+import ai.onnxruntime.OrtSession
 import com.intellij.openapi.components.Service
-import io.kinference.InferenceEngine
-import io.kinference.core.KIEngine
-import io.kinference.core.model.KIModel
-import io.kinference.data.ONNXData
-import io.kinference.data.ONNXDataType
-import io.kinference.ort.model.ORTModel
-import io.kinference.ort.ORTEngine
-import io.kinference.ort.ORTData
-
+import com.intellij.psi.PsiComment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import okio.Path.Companion.toPath
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.nio.LongBuffer
+
+object ModelLoader {
+    private var ortSession: OrtSession? = null
+
+    val session: OrtSession
+        get() {
+            if (ortSession == null) {
+                ortSession = loadSession()
+            }
+            return ortSession!!
+        }
+
+    private fun loadSession(): OrtSession {
+        val modelPath = "model/roberta-sequence-classification-9.onnx"
+        val modelInputStream = this::class.java.classLoader.getResourceAsStream(modelPath)
+
+        val tempFile = File.createTempFile("model-", ".onnx")
+        modelInputStream.use { input ->
+            tempFile.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        }
+
+        val env = OrtEnvironment.getEnvironment()
+        val session = env.createSession(tempFile.absolutePath)
+        println("Roberta model was successfully loaded.")
+        tempFile.deleteOnExit()
+
+        return session
+    }
+}
+
+
 
 @Service(Service.Level.PROJECT)
 class Analyzer : CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
-    private var model: ORTModel? = null
-    private val ENGINE = KIEngine
-    private var model_engine = KIModel
+    fun sentimentAnalysis(token: LongArray): Int {
+        val session = ModelLoader.session
+        val longBuffer = LongBuffer.wrap(token)
 
-    init {
-        // Load the model asynchronously
-        launch {
-            loadModel()
-        }
-    }
+        val env = OrtEnvironment.getEnvironment()
+        val tensor = OnnxTensor.createTensor(env, longBuffer, longArrayOf(1, token.size.toLong()))
 
-    private suspend fun loadModel() {
-        val modelPath = "model/roberta-sequence-classification-9.onnx".toPath()
-        model = ORTEngine.loadModel(modelPath)
+        val inputNames = session.inputNames
+        println(inputNames)
+        val inputMap = mapOf("input" to tensor)
 
-    }
+        val output = session.run(inputMap)
+        val outputTensor = output["output"].get() as OnnxTensor
+        val buffer = outputTensor.floatBuffer
+        val probabilities = FloatArray(buffer.remaining())
+        buffer.get(probabilities)
 
-    fun sentimentAnalysis(token: LongArray): Map<String, ORTData<*>> {
+        println("Probability of class 1: ${probabilities[0]}")
+        println("Probability of class 2: ${probabilities[1]}")
 
-        val tokenArray = longArrayToByteArray(token)
-//        required input: bytearray and model tensor, return ORTData
-        val ortInputData = ORTEngine.loadData(tokenArray, ONNXDataType.ONNX_TENSOR)
+        val result = probabilities.indices.maxByOrNull { probabilities[it] } ?: -1
+        return result
 
-        val inputList = listOf(ortInputData)
-        val loadedModel = model ?: throw IllegalStateException("Model not loaded.")
-
-        // Perform the prediction within a coroutine context
-        return runBlocking {
-//            required to be input is ORTData
-            val result = loadedModel.predict(inputList)
-
-            result
-        }
-    }
-
-    private fun longArrayToByteArray(longArray: LongArray): ByteArray {
-        val byteArray = ByteArray(longArray.size * 8) // Each Long is 8 bytes
-        for (i in longArray.indices) {
-            val longValue = longArray[i]
-            for (j in 0 until 8) {
-                byteArray[i * 8 + j] = (longValue shr (j * 8)).toByte()
-            }
-        }
-        return byteArray
     }
 }

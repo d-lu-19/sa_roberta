@@ -29,6 +29,9 @@ sourceSets {
         kotlin.srcDir("src/main/kotlin")
         resources.srcDir("src/main/resources")
     }
+    val test by getting {
+        resources.srcDir("src/test/resources")
+    }
 }
 
 // Configure project's dependencies
@@ -48,10 +51,13 @@ repositories {
     }
 }
 
+
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
     implementation("io.kinference", "inference-ort", "0.2.16")
 }
+
+
 
 //dependencies {
 //    implementation("cloud.genesys:roberta-tokenizer:1.0.6")
