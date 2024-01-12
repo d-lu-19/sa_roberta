@@ -9,6 +9,12 @@ import javax.swing.table.DefaultTableModel
 
 @Service(Service.Level.PROJECT)
 class Loader() {
+    fun scrollpaneLoader(model: DefaultTableModel): JBScrollPane {
+        val table = JBTable(model)
+        val scrollPane = JBScrollPane(table)
+
+        return scrollPane
+    }
     fun tableLoader(commentSentimentMap: MutableMap<PsiComment, Int?>): DefaultTableModel {
         val model = DefaultTableModel()
         model.addColumn("Comment")
@@ -21,13 +27,7 @@ class Loader() {
 
         return model
     }
-    
-    fun scrollpaneLoader(filename: String, model: DefaultTableModel): JBScrollPane {
-        val table = JBTable(model)
-        val scrollPane = JBScrollPane(table)
 
-        return scrollPane
-    }
 }
 
 

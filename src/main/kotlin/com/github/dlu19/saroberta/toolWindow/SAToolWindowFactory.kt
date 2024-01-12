@@ -1,52 +1,62 @@
 package com.github.dlu19.saroberta.toolWindow
 
-import com.github.dlu19.saroberta.actions.SentimentAnalysisAction
-import com.github.dlu19.saroberta.toolWindow.FileHolder.selectedFiles
-import com.intellij.ide.DataManager
-import com.intellij.ide.impl.ProjectUtil
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.fileChooser.FileChooser
-import com.intellij.openapi.fileChooser.FileChooserDescriptor
-import com.intellij.openapi.fileEditor.FileEditorManager
+import com.github.dlu19.saroberta.listeners.FileSelectionListener
+import com.github.dlu19.saroberta.listeners.FileTableMapListener
+import com.github.dlu19.saroberta.services.Loader
+import com.github.dlu19.saroberta.services.MapParser
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages
-import com.intellij.openapi.util.io.toNioPath
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VfsUtil
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
+import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.ContentFactory
-import okio.Path.Companion.toPath
+import java.awt.BorderLayout
+import java.awt.Dimension
 import javax.swing.*
 import javax.swing.JComponent
 import java.io.File
 import javax.swing.filechooser.FileNameExtensionFilter
 import javax.swing.filechooser.FileSystemView
 
+class SAToolWindowFactory : ToolWindowFactory, FileTableMapListener {
 
-object FileHolder {
-    var selectedFiles: List<File>? = null
-}
-
-class SAToolWindowFactory : ToolWindowFactory {
+    private lateinit var tabbedPane: JBTabbedPane
+    private var project: Project? = null
+    private var loaderService: Loader? = null
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
+        this.project = project
+        this.loaderService = project.service<Loader>()
+        this.tabbedPane = JBTabbedPane()
+
+        MapParser.setListener(this)
+
+        val panel = createToolWindowPanel(project)
         val contentFactory = ContentFactory.getInstance()
-        val content = contentFactory.createContent(createToolWindowPanel(project), "", false)
+        val content = contentFactory.createContent(panel, "", false)
         toolWindow.contentManager.addContent(content)
     }
 
-    private fun createToolWindowPanel(project: Project): JComponent {
+    override fun onFileTableMapUpdated() {
+        project?.let { loadTabbedPane(it) }
+    }
 
-        thisLogger().info("Initializing a tool window...")
-        val panel = JPanel()
+    private fun loadTabbedPane(project: Project) {
+        tabbedPane.removeAll()
+        loaderService?.let { loader ->
+            MapParser.getFileTableMap().forEach { (filename, model) ->
+                model?.let {
+                    val scrollpane = loader.scrollpaneLoader(it)
+                    tabbedPane.addTab(filename, scrollpane)
+                }
+            }
+        }
+    }
 
-        // Create and configure JFileChooser
+    private fun createFileChooser(panel: JPanel, project: Project): JFileChooser {
+        // Create and define the default root for FileChooser as project root
         val projectBasePath = project.basePath
         val projectDirFile = projectBasePath?.let { File(it) }
-
         val fileSystemView = object : FileSystemView() {
             override fun createNewFolder(containingDir: File): File {
                 throw UnsupportedOperationException("Not supported.")
@@ -60,10 +70,11 @@ class SAToolWindowFactory : ToolWindowFactory {
 
             override fun isRoot(f: File): Boolean = f == projectDirFile
         }
-
-        // Create and configure JFileChooser with the custom FileSystemView
         val fileChooser = JFileChooser(fileSystemView)
 
+        // Configure the size and file selection option of FileChooser
+        val fileChooserHeight = fileChooser.preferredSize.height
+        fileChooser.preferredSize = Dimension(panel.preferredSize.width, fileChooserHeight)
         fileChooser.fileSelectionMode = JFileChooser.FILES_ONLY
         fileChooser.isAcceptAllFileFilterUsed = false
         fileChooser.isMultiSelectionEnabled = true
@@ -73,58 +84,26 @@ class SAToolWindowFactory : ToolWindowFactory {
         fileChooser.addChoosableFileFilter(kotlinFileFilter)
         fileChooser.fileFilter = kotlinFileFilter
 
-        // Add file chooser to panel
-        panel.add(fileChooser)
+        fileChooser.addActionListener(FileSelectionListener(fileChooser, panel, project))
 
-        // Open a file chooser under the current project when the tool window content is created
+        return fileChooser
+    }
 
-        fileChooser.addActionListener { event ->
-            // Check if a file was selected
-            if (event.actionCommand == JFileChooser.APPROVE_SELECTION) {
-                val selectedFiles: List<File> = fileChooser.selectedFiles.toList()
-                FileHolder.selectedFiles = selectedFiles
+    private fun createToolWindowPanel(project: Project): JComponent? {
 
-                val selectedFilePaths = selectedFiles.joinToString(separator = "\n") { it.absolutePath }
-                // Construct the message with the selected file paths
-                val message = "You selected the following files:\n\n$selectedFilePaths \nDo you want to perform sentiment analysis on the selected file?"
-
-                val customIcon: Icon = ImageIcon(javaClass.getResource("/icons/icon.png"))
-                val confirmation = Messages.showOkCancelDialog(
-                    panel,
-                    message,
-                    "Confirmation",
-                    "Perform Sentiment Analysis",
-                    "Cancel",
-                    customIcon
-                )
-
-                // Perform Sentiment Analysis actions with the selected files
-                if (confirmation == Messages.OK) {
-                    val fileEditorManager = FileEditorManager.getInstance(project)
-                    for (file in selectedFiles) {
-                        val virtualFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file)
-                        if (virtualFile != null) {
-                            fileEditorManager.openFile(virtualFile, true)
-                        }
-                    }
-
-                    val sentimentAnalysisAction = SentimentAnalysisAction()
-                    val event = AnActionEvent.createFromDataContext(
-                        "SentimentAnalysisAction",
-                        null,
-                        DataManager.getInstance().getDataContext(panel)
-                    )
-                    sentimentAnalysisAction.actionPerformed(event)
-                }
-            }
-        }
+        // Initializing panel for the plugin
+        val panel = JPanel(BorderLayout())
+        panel.add(createFileChooser(panel, project), BorderLayout.NORTH)
+        panel.add(tabbedPane, BorderLayout.CENTER)
 
         return panel
+
     }
 
-    override fun shouldBeAvailable(project: Project): Boolean {
-        return true
-    }
+
+
 }
+
+
 
 

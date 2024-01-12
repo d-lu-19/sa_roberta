@@ -4,18 +4,12 @@ package com.github.dlu19.saroberta.services
 import com.github.dlu19.saroberta.robertaTokenizer.RobertaTokenizer
 import com.github.dlu19.saroberta.robertaTokenizer.RobertaTokenizerResources
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.project.Project
 
 
 @Service(Service.Level.PROJECT)
 class Tokenizer() {
 
-    init{
-        thisLogger().info("Start building tokenizer...")
-    }
-//    private val baseDirPath = "src/main/resources/test-vocabularies"
-
+    // Load the necessary files for building robertaTokenizer
     object FileConstants {
         const val BASE_VOCABULARY_FILE_NAME = "test-vocabularies/base_vocabulary.json"
         const val VOCABULARY_FILE_NAME = "test-vocabularies/vocabulary.json"
@@ -31,9 +25,9 @@ class Tokenizer() {
     private val robertaResources = RobertaTokenizerResources(FILE_NAME_LIST)
     private val robertaTokenizer = RobertaTokenizer(robertaResources)
 
+    // Obtain the token for comment text
     fun commentTokenizer(comment: String): LongArray {
         println("Processing comment: $comment")
-//        val token: List<Int> = robertaTokenizer.tokenize(comment).map{ it.toInt() }
         val token = robertaTokenizer.tokenize(comment)
         return token
     }

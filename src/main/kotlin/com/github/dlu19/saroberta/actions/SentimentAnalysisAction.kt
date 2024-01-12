@@ -1,49 +1,37 @@
 package com.github.dlu19.saroberta.actions
 
-
-import com.github.dlu19.saroberta.listeners.Displayer
-import com.github.dlu19.saroberta.services.Analyzer
-import com.github.dlu19.saroberta.services.Extractor
-import com.github.dlu19.saroberta.services.Tokenizer
-import com.github.dlu19.saroberta.toolWindow.FileHolder
+import com.github.dlu19.saroberta.listeners.FileHolder
+import com.github.dlu19.saroberta.services.*
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.fileEditor.TextEditor
-import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.IconLoader
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiComment
-import com.intellij.psi.PsiManager
-import com.intellij.psi.util.PsiTreeUtil
+import java.io.File
+import java.nio.file.Files
+import javax.swing.ImageIcon
+import javax.swing.table.DefaultTableModel
 
 
-class SentimentAnalysisAction() : AnAction("Perform Sentiment Analysis") {
-
-    init {
-        templatePresentation.icon = IconLoader.getIcon("/icons/icon.png", SentimentAnalysisAction::class.java)
-    }
+class SentimentAnalysisAction() : AnAction("Sentiment Analysis On Current File") {
 
     override fun actionPerformed(e: AnActionEvent) {
         val selectedFiles = FileHolder.selectedFiles
+        val fileTableMap = mutableMapOf<String, DefaultTableModel?>()
 
-        thisLogger().info("Start performing Sentiment Analysis Action...")
-
-        // Extract comments of each selected file
         if (selectedFiles != null) {
             for (file in selectedFiles) {
+                // Instantiation of essential services
                 val extractorService = e.project?.service<Extractor>()
                 val tokenizerService = e.project?.service<Tokenizer>()
                 val analyzerService = e.project?.service<Analyzer>()
-                val displayer = object : Displayer() {}
+                val loaderService = e.project?.service<Loader>()
 
                 val comments = extractorService?.commentExtractor(file)
                 val commentSentimentMap = mutableMapOf<PsiComment, Int?>()
 
+                // Perform Sentiment Analysis for each comment
                 if (comments != null) {
                     for (comment in comments) {
                         //Get the token of each comment
@@ -53,14 +41,25 @@ class SentimentAnalysisAction() : AnAction("Perform Sentiment Analysis") {
                         commentSentimentMap[comment] = prediction
                     }
                 }
-                val hints = file?.let { e.project?.let { it1 ->
-                    displayer.sentimentDisplayer(it,
-                        it1, commentSentimentMap) }
+
+                // Inform if no PsiComment observed
+                else{
+                    Messages.showMessageDialog(
+                        "There are no comments in file ${file.name}",
+                        "Information",
+                        ImageIcon(javaClass.getResource("/icons/thinking-face.svg"))
+                    )
                 }
+                e.project?.let { MapParser.updateComSenMap(commentSentimentMap) }
 
-
+                val tableModel = loaderService?.tableLoader(commentSentimentMap)
+                fileTableMap[file.name] = tableModel
             }
+            MapParser.updateFileTableMap(fileTableMap)
+
         }
+
     }
 }
+
 

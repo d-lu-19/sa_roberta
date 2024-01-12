@@ -1,13 +1,9 @@
 package com.github.dlu19.saroberta
 
-import com.github.dlu19.saroberta.listeners.Displayer
-import com.github.dlu19.saroberta.services.Analyzer
 import com.github.dlu19.saroberta.services.Extractor
 import com.intellij.openapi.components.service
-import com.intellij.psi.PsiComment
 import com.intellij.testFramework.TestDataPath
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
-import org.junit.Test
 import java.io.File
 
 @TestDataPath("\$CONTENT_ROOT/src/test/testData")
