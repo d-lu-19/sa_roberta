@@ -1,10 +1,14 @@
 package com.github.dlu19.saroberta.actions
 
 import com.github.dlu19.saroberta.listeners.FileHolder
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.psi.PsiManager
 import java.io.File
 
 class RunMenuAction () : AnAction() {
@@ -16,6 +20,13 @@ class RunMenuAction () : AnAction() {
         if (currentFile != null) {
             // Add the current file to FileHolder
             FileHolder.selectedFiles = listOf(File(currentFile.path))
+
+            val psiManager = PsiManager.getInstance(e.project!!)
+            val psiFile = currentFile?.let { psiManager.findFile(it) }
+            if (psiFile != null) {
+                DaemonCodeAnalyzer.getInstance(e.project).restart(psiFile)
+            }
+
             val sentimentAnalysisAction = SentimentAnalysisAction()
             sentimentAnalysisAction.actionPerformed(e)
         } else {
