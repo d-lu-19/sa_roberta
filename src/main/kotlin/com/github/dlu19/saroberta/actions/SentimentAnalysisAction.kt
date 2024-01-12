@@ -3,6 +3,7 @@ package com.github.dlu19.saroberta.actions
 
 import com.github.dlu19.saroberta.listeners.Displayer
 import com.github.dlu19.saroberta.services.Analyzer
+import com.github.dlu19.saroberta.services.Extractor
 import com.github.dlu19.saroberta.services.Tokenizer
 import com.github.dlu19.saroberta.toolWindow.FileHolder
 import com.intellij.openapi.actionSystem.AnAction
@@ -27,47 +28,35 @@ class SentimentAnalysisAction() : AnAction("Perform Sentiment Analysis") {
         templatePresentation.icon = IconLoader.getIcon("/icons/icon.png", SentimentAnalysisAction::class.java)
     }
 
-    private fun getEditorInstance(virtualFile: VirtualFile, project: Project): Editor? {
-        val fileEditor = FileEditorManager.getInstance(project).getEditors(virtualFile).firstOrNull()
-        return if (fileEditor is TextEditor) {
-            fileEditor.editor
-        } else {
-            null
-        }
-    }
-
-
     override fun actionPerformed(e: AnActionEvent) {
         val selectedFiles = FileHolder.selectedFiles
-        val psiManager = e.project?.let { PsiManager.getInstance(it) }
 
         thisLogger().info("Start performing Sentiment Analysis Action...")
 
         // Extract comments of each selected file
         if (selectedFiles != null) {
             for (file in selectedFiles) {
-
-                println("Processing file: ${file.absoluteFile}")
-
-                val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(file)
-                val psiFile = virtualFile?.let { psiManager?.findFile(it) }
-                val comments = PsiTreeUtil.findChildrenOfType(psiFile, PsiComment::class.java)
-                val commentSentimentMap = mutableMapOf<PsiComment, Int?>()
-                val editor = virtualFile?.let { e.project?.let { it1 -> getEditorInstance(it, it1) } }
-
+                val extractorService = e.project?.service<Extractor>()
                 val tokenizerService = e.project?.service<Tokenizer>()
                 val analyzerService = e.project?.service<Analyzer>()
                 val displayer = object : Displayer() {}
 
+                val comments = extractorService?.commentExtractor(file)
+                val commentSentimentMap = mutableMapOf<PsiComment, Int?>()
 
-                for (comment in comments) {
-                    //Get the token of each comment
-                    val commentText = comment.text
-                    val token = tokenizerService?.commentTokenizer(commentText)
-                    val prediction = token?.let { analyzerService?.sentimentAnalysis(it) }
-                    commentSentimentMap[comment] = prediction
+                if (comments != null) {
+                    for (comment in comments) {
+                        //Get the token of each comment
+                        val commentText = comment.text
+                        val token = tokenizerService?.commentTokenizer(commentText)
+                        val prediction = token?.let { analyzerService?.sentimentAnalysis(it) }
+                        commentSentimentMap[comment] = prediction
+                    }
                 }
-                val hints = displayer.sentimentDisplayer(editor, commentSentimentMap)
+                val hints = file?.let { e.project?.let { it1 ->
+                    displayer.sentimentDisplayer(it,
+                        it1, commentSentimentMap) }
+                }
 
 
             }

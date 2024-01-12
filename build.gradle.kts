@@ -57,6 +57,10 @@ dependencies {
     implementation("io.kinference", "inference-ort", "0.2.16")
 }
 
+dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
+}
 
 
 //dependencies {
@@ -71,9 +75,6 @@ kotlin {
         vendor = JvmVendorSpec.JETBRAINS
     }
 }
-
-
-
 
 
 // Configure Gradle IntelliJ Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html

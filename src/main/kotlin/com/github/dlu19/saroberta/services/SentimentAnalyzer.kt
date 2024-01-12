@@ -43,8 +43,6 @@ object ModelLoader {
     }
 }
 
-
-
 @Service(Service.Level.PROJECT)
 class Analyzer : CoroutineScope by CoroutineScope(Dispatchers.Default) {
 

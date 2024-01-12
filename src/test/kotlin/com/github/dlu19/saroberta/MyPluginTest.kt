@@ -2,37 +2,53 @@ package com.github.dlu19.saroberta
 
 import com.github.dlu19.saroberta.listeners.Displayer
 import com.github.dlu19.saroberta.services.Analyzer
-import com.github.weisj.jsvg.e
+import com.github.dlu19.saroberta.services.Extractor
 import com.intellij.openapi.components.service
 import com.intellij.psi.PsiComment
+import com.intellij.testFramework.TestDataPath
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import org.junit.Test
+import java.io.File
 
-//import com.github.dlu19.saroberta.services.MyProjectService
-
-//@TestDataPath("\$CONTENT_ROOT/src/test/testData")
+@TestDataPath("\$CONTENT_ROOT/src/test/testData")
 class MyPluginTest : BasePlatformTestCase() {
 
-    fun testProjectService() {
-        val projectService = project.service<Analyzer>()
-        val token = longArrayOf(0, 3, 3, 114, 3, 3, 10, 8, 3, 3, 10, 114, 3, 5, 3, 3, 7, 13, 10, 9, 114, 5, 3, 114, 7, 3, 3, 3, 114, 9, 7, 4, 7, 3, 10, 7, 12, 114, 3, 11, 4, 7, 2)
+    // Test to verify correct extraction of comments
+    override fun getTestDataPath() = "src/test/testData"
+    fun testCommentExtractor() {
+        val testDataPath = "src/test/testData/test.kt"
+        val file = File(testDataPath)
+        val extractor = project.service<Extractor>()
+        val comments = extractor.commentExtractor(file)
+        val expectedComments = listOf(
+            "// This is a nice comment",
+            "// This is a bad comment."
+        )
 
-        val result = projectService.sentimentAnalysis(token)
+        // Asserting that the extracted comments match the expected comments
+        assertEquals(expectedComments.toString(), comments.map { it.text })
     }
-//    fun testinlayhintsgeneration() {
-        // Setup test environment
-//        myFixture.configureByText("TestFile.kt", "// This is a comment")
+
+//    @Test
+//    fun testSentimentDisplayer() {
+//        val testDataPath = "test.kt"
+//        val file = File(testDataPath)
+//        val commentSentimentMap = mutableMapOf<PsiComment, Int?>()
+//        val comments = extractor.commentExtractor(file)
 //
-//        val file = myFixture.file
-//        val comment = file.findElementAt(0) as PsiComment
-//        assertNotNull("Comment should not be null", comment)
+//        // Assigning sentiment values to comments
+//        for ((index, comment) in comments.withIndex()) {
+//            val sentimentValue = if (index == 0) 1 else 0 // 1 for positive, 0 for negative
+//            commentSentimentMap[comment] = sentimentValue
+//        }
 //
-//        val commentSentimentMap = mutableMapOf<PsiComment, Int>()
-//        commentSentimentMap[comment] = 0 // Assuming negative sentiment
+//        // Displaying the sentiments
 //
-//        val displayer = object : Displayer() {}
-//        val hints = displayer.sentimentDisplayer(commentSentimentMap)
+//        val hints = displayer.sentimentDisplayer(file, project, commentSentimentMap)
 //
+//        // Asserting that hints are not empty and checking the sentiment display
 //        assertTrue("Hints should not be empty", hints.isNotEmpty())
-//        assertEquals("Inlay text should be a negative emoji", "\uD83D\uDE41", hints[0].text)
-    }
+//        assertEquals("Inlay text for the first comment should be a positive emoji", ":)", hints[0].text) // Assuming ":)" is a positive emoji
+//    }
 
+}
