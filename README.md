@@ -1,44 +1,91 @@
-# sa_roberta
+# Sentiment Analysis Tool for Comments using Roberta Model
 
-![Build](https://github.com/d-lu-19/sa_roberta/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
+## Overview
 
-## Template ToDo list
-- [x] Create a new [IntelliJ Platform Plugin Template][template] project.
-- [ ] Get familiar with the [template documentation][template].
-- [ ] Adjust the [pluginGroup](./gradle.properties), [plugin ID](./src/main/resources/META-INF/plugin.xml) and [sources package](./src/main/kotlin).
-- [ ] Adjust the plugin description in `README` (see [Tips][docs:plugin-description])
-- [ ] Review the [Legal Agreements](https://plugins.jetbrains.com/docs/marketplace/legal-agreements.html?from=IJPluginTemplate).
-- [ ] [Publish a plugin manually](https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html?from=IJPluginTemplate) for the first time.
-- [ ] Set the `PLUGIN_ID` in the above README badges.
-- [ ] Set the [Plugin Signing](https://plugins.jetbrains.com/docs/intellij/plugin-signing.html?from=IJPluginTemplate) related [secrets](https://github.com/JetBrains/intellij-platform-plugin-template#environment-variables).
-- [ ] Set the [Deployment Token](https://plugins.jetbrains.com/docs/marketplace/plugin-upload.html?from=IJPluginTemplate).
-- [ ] Click the <kbd>Watch</kbd> button on the top of the [IntelliJ Platform Plugin Template][template] to be notified about releases containing new features and fixes.
+[Your Plugin Name] is a plugin for IntelliJ IDEA that [briefly describe what your plugin does]. This document provides instructions for setting up, running, and testing the plugin in a development environment.
 
 <!-- Plugin description -->
-This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
+**IntelliJ Platform Plugin Template** is a repository that provides a pure template to make it easier to create a new plugin project (check the [Creating a repository from a template][gh:template] article).
 
-This specific section is a source for the [plugin.xml](/src/main/resources/META-INF/plugin.xml) file which will be extracted by the [Gradle](/build.gradle.kts) during the build process.
+The main goal of this template is to speed up the setup phase of plugin development for both new and experienced developers by preconfiguring the project scaffold and CI, linking to the proper documentation pages, and keeping everything organized.
 
-To keep everything working, do not remove `<!-- ... -->` sections. 
+[gh:template]: https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template
 <!-- Plugin description end -->
 
-## Installation
+## Prerequisites
 
-- Using the IDE built-in plugin system:
-  
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "sa_roberta"</kbd> >
-  <kbd>Install</kbd>
-  
-- Manually:
+Before you begin, ensure you have the following installed:
+- IntelliJ IDEA (Community or Ultimate edition)
+- Java Development Kit (JDK) [specify version if needed]
+- [Any other dependencies your plugin requires]
 
-  Download the [latest release](https://github.com/d-lu-19/sa_roberta/releases/latest) and install it manually using
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
+## Setting Up the Development Environment
+
+1. **Clone the Plugin Repository**:
+   ```sh
+   git clone [URL of your plugin's repository]
+   cd [repository name]
 
 
----
-Plugin based on the [IntelliJ Platform Plugin Template][template].
+2. **Open the Project in IntelliJ IDEA**:
+- Launch IntelliJ IDEA.
+- Select `File > Open` and choose the plugin project directory.
 
-[template]: https://github.com/JetBrains/intellij-platform-plugin-template
-[docs:plugin-description]: https://plugins.jetbrains.com/docs/intellij/plugin-user-experience.html#plugin-description-and-presentation
+3. **Configure the Project SDK**:
+- Go to `File > Project Structure > Project`.
+- Set the Project SDK to your installed JDK.
+
+4. **Install Required Plugins**:
+- If your plugin depends on other plugins, install them via `Settings > Plugins`.
+
+## Running the Plugin
+
+1. **Create a Run Configuration**:
+- Go to `Run > Edit Configurations`.
+- Add a new `Plugin` configuration.
+- Name the configuration (e.g., "Run MyPlugin").
+
+2. **Run the Plugin**:
+- Select the created run configuration.
+- Click `Run > Run 'Run MyPlugin'`.
+
+This will launch a new instance of IntelliJ IDEA with your plugin installed.
+
+## Testing the Plugin
+
+1. **Write Test Cases**:
+- Create test cases under `src/test` to verify the functionality of your plugin.
+- Use JUnit or any other testing framework supported by IntelliJ IDEA.
+
+2. **Run the Tests**:
+- Right-click on the test directory or individual tests.
+- Select `Run 'Tests in ...'`.
+
+## Debugging the Plugin
+
+1. **Set Breakpoints**:
+- Open the source code where you want to debug.
+- Click on the left gutter to add breakpoints.
+
+2. **Start Debugging**:
+- Select the run configuration.
+- Click `Run > Debug 'Run MyPlugin'`.
+
+## Packaging and Distribution
+
+1. **Prepare the Plugin for Distribution**:
+- Go to `Build > Prepare Plugin Module '[YourModuleName]' For Deployment`.
+- This will generate a ZIP file containing the plugin.
+
+2. **Publish the Plugin**:
+- Visit [IntelliJ Plugin Repository](https://plugins.jetbrains.com/).
+- Upload the packaged ZIP file.
+
+## Support and Contribution
+
+- **Issues and Suggestions**: File issues or feature requests on [GitHub issues page/repository issues link].
+- **Contributing**: Please read [CONTRIBUTING.md] for details on our code of conduct, and the process for submitting pull requests.
+
+## License
+
+This project is licensed under the [Your License] - see the [LICENSE.md] file for details.

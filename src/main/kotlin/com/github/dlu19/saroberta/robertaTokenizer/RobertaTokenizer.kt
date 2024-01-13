@@ -2,10 +2,9 @@ package com.github.dlu19.saroberta.robertaTokenizer
 
 import java.nio.charset.StandardCharsets
 import java.util.regex.Pattern
-import java.io.ByteArrayOutputStream
 
 class RobertaTokenizer(
-    private var robertaResources: RobertaTokenizerResources = RobertaTokenizerResources(listOf()),
+    private var robertaResources: RobertaTokenizerResources,
     private var clsToken: Long = DEFAULT_CLS_TOKEN,
     private var sepToken: Long = DEFAULT_SEP_TOKEN,
     private var unkToken: Long = DEFAULT_UNK_TOKEN
@@ -29,12 +28,17 @@ class RobertaTokenizer(
             encodedStrings.add(matchedSequenceEncoded.toString())
         }
 
-        val outputTokens = encodedStrings.asSequence()
-            .map { encodedStr -> bytePairEncoder.encode(encodedStr, robertaResources) }
-            .flatMap { encodedStrList -> encodedStrList.map { word -> robertaResources.encodeWord(word, unkToken) } }
-            .flatMap { sequenceOf(it) }
+        println(encodedStrings)
 
-        return sequenceOf(clsToken).plus(outputTokens).plus(sequenceOf(sepToken)).toList().toLongArray()
+        val outputTokens = encodedStrings.asSequence()
+            // Returns list of strings ready for vocabulary mapping
+            .map { encodedStr -> bytePairEncoder.encode(encodedStr, robertaResources) }
+            // Mapping each word in the given lists to a Long token from the vocabulary
+            .flatMap { encodedStrList -> encodedStrList.asSequence().map { word -> robertaResources.encodeWord(word, unkToken) } }
+            .toList()
+
+        val tokensWithCls = listOf(clsToken) + outputTokens // Adding BOS
+        return (tokensWithCls + sepToken).toLongArray() // Adding EOS
     }
 
     fun getClsToken() = clsToken

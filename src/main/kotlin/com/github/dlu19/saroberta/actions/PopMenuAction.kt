@@ -1,5 +1,4 @@
 package com.github.dlu19.saroberta.actions
-
 import com.github.dlu19.saroberta.listeners.FileHolder
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.openapi.actionSystem.AnAction
@@ -21,11 +20,19 @@ class RunMenuAction () : AnAction() {
             // Add the current file to FileHolder
             FileHolder.selectedFiles = listOf(File(currentFile.path))
 
-            val psiManager = PsiManager.getInstance(e.project!!)
-            val psiFile = currentFile?.let { psiManager.findFile(it) }
-            if (psiFile != null) {
-                DaemonCodeAnalyzer.getInstance(e.project).restart(psiFile)
+            if (currentFile?.let { fileEditorManager.isFileOpen(it) } == true) {
+                // Close the file if it's already open
+                currentFile?.let { fileEditorManager.closeFile(it) }
             }
+
+            // Open the file (this will reopen it if it was already open)
+            currentFile?.let { fileEditorManager.openFile(it, true) }
+
+//            val psiManager = PsiManager.getInstance(e.project!!)
+//            val psiFile = currentFile?.let { psiManager.findFile(it) }
+//            if (psiFile != null) {
+//                DaemonCodeAnalyzer.getInstance(e.project).restart(psiFile)
+//            }
 
             val sentimentAnalysisAction = SentimentAnalysisAction()
             sentimentAnalysisAction.actionPerformed(e)

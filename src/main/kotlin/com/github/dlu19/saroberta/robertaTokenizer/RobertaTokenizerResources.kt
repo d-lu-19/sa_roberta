@@ -1,14 +1,17 @@
 package com.github.dlu19.saroberta.robertaTokenizer
 
+import com.genesys.roberta.tokenizer.BiGram
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import java.io.BufferedReader
+import com.intellij.util.containers.reverse
+import kotlinx.html.ARel.index
+import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
-class RobertaTokenizerResources(FILE_NAME_LIST: List<String>) {
+class RobertaTokenizerResources(FILE_NAME_LIST: List<String?>) {
 
     private lateinit var baseVocabularyMap: Map<Int, String>
     private lateinit var vocabularyMap: Map<String, Long>
@@ -18,13 +21,14 @@ class RobertaTokenizerResources(FILE_NAME_LIST: List<String>) {
         loadResourceStream(FILE_NAME_LIST)
     }
 
-    private fun getResourceStream(fileNames: List<String>): List<InputStream> {
+
+    private fun getResourceStream(fileNames: List<String?>): List<InputStream> {
         return fileNames.mapNotNull { fileName ->
             this::class.java.classLoader.getResourceAsStream(fileName)
         }
     }
 
-    private fun loadResourceStream(FILE_NAME_LIST: List<String>) {
+    private fun loadResourceStream(FILE_NAME_LIST: List<String?>) {
         val streamList = getResourceStream(FILE_NAME_LIST)
 
         this.baseVocabularyMap = loadBaseVocabularyStream(streamList[0])
@@ -50,27 +54,22 @@ class RobertaTokenizerResources(FILE_NAME_LIST: List<String>) {
         }
     }
 
-
-
     private fun loadMergesFileStream(inputStream: InputStream): Map<BiGram, Int> {
         try {
-            val reader = BufferedReader(InputStreamReader(inputStream, StandardCharsets.UTF_8))
-            return reader.useLines { lines ->
-                lines.mapIndexed { idx, line ->
-                    val tokens = line.split(" ")
-                    val biGram = BiGram.of(tokens)
-                    biGram to idx
+            inputStream.bufferedReader(StandardCharsets.UTF_8).use { reader ->
+                val lines = reader.readLines()
+                return lines.mapIndexedNotNull { idx, line ->
+                    val parts = line.trim().split("\\s+".toRegex())
+                    if (parts.size == 2) BiGram.of(parts) to idx else null
                 }.toMap()
             }
         } catch (e: IOException) {
-            throw IllegalStateException("Failed to load merges file for Roberta from InputStream", e)
+            throw IllegalStateException("Failed to load merges file for Roberta", e)
         }
     }
 
     fun encodeByte(key: Byte): String {
-        val unsignedKey = key.toInt() and 0xFF
-        return baseVocabularyMap[unsignedKey]
-            ?: throw IllegalArgumentException("Invalid byte to encode: $key")
+        return baseVocabularyMap[key.toInt() and 0xFF] ?: ""
     }
 
     fun encodeWord(word: String, defaultValue: Long): Long {
@@ -78,6 +77,11 @@ class RobertaTokenizerResources(FILE_NAME_LIST: List<String>) {
     }
 
     fun getRankOrDefault(biGram: BiGram, defaultValue: Int): Int {
-        return bpeRanks[biGram] ?: defaultValue
+        bpeRanks.keys.forEachIndexed { idx, key ->
+            if (key.left == biGram.left && key.right == biGram.right) {
+                return idx
+            }
+        }
+        return defaultValue
     }
 }

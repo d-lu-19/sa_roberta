@@ -6,10 +6,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
 import com.intellij.openapi.ui.Messages
-import com.intellij.openapi.util.IconLoader
 import com.intellij.psi.PsiComment
-import java.io.File
-import java.nio.file.Files
 import javax.swing.ImageIcon
 import javax.swing.table.DefaultTableModel
 
@@ -46,8 +43,8 @@ class SentimentAnalysisAction() : AnAction("Sentiment Analysis On Current File")
                 else{
                     Messages.showMessageDialog(
                         "There are no comments in file ${file.name}",
-                        "Information",
-                        ImageIcon(javaClass.getResource("/icons/thinking-face.svg"))
+                        "Information" ,
+                        ImageIcon(javaClass.getResource("/icons/thinking.png"))
                     )
                 }
                 e.project?.let { MapParser.updateComSenMap(commentSentimentMap) }

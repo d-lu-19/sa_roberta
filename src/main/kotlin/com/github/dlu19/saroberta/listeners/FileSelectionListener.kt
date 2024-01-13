@@ -40,7 +40,7 @@ class FileSelectionListener(
                 "Confirmation",
                 "OK",
                 "Cancel",
-                ImageIcon(javaClass.getResource("/icons/thinking-face.svg"))
+                ImageIcon(javaClass.getResource("/icons/thinking.png"))
             )
 
             // Open the selected files in the editor and perform sentiment analysis
@@ -48,9 +48,14 @@ class FileSelectionListener(
                 val fileEditorManager = FileEditorManager.getInstance(project)
                 for (file in selectedFiles) {
                     val virtualFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file)
-                    virtualFile?.let {
-                        fileEditorManager.openFile(it, true)
+
+                    if (virtualFile?.let { fileEditorManager.isFileOpen(it) } == true) {
+                        // Close the file if it's already open
+                        virtualFile?.let { fileEditorManager.closeFile(it) }
                     }
+
+                    // Open the file (this will reopen it if it was already open)
+                    virtualFile?.let { fileEditorManager.openFile(it, true) }
                 }
 
                 val sentimentAnalysisAction = SentimentAnalysisAction()

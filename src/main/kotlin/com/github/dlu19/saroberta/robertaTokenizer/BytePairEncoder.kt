@@ -1,5 +1,7 @@
 package com.github.dlu19.saroberta.robertaTokenizer
 
+import com.genesys.roberta.tokenizer.BiGram
+
 /**
  * Byte-Pair-Encoding
  * Relies on a pre-tokenizer that splits the training data into words, in our case space.
@@ -80,8 +82,8 @@ class BytePairEncoder {
     }
 
     private fun getIndexWithStartPosition(wordCharsList: List<String>, word: String, startPosition: Int): Int {
-        return (startPosition until wordCharsList.size)
-            .firstOrNull { idx -> wordCharsList[idx] == word }
-            ?: -1
+        return wordCharsList.subList(startPosition, wordCharsList.size)
+            .indexOfFirst { it == word }
+            .let { if (it == -1) -1 else it + startPosition }
     }
 }
