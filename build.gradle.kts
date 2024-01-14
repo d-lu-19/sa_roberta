@@ -29,6 +29,11 @@ sourceSets {
     val main by getting {
         kotlin.srcDir("src/main/kotlin")
         resources.srcDir("src/main/resources")
+        dependencies {
+            implementation(kotlin("stdlib-common"))
+            implementation("io.kinference:inference-core:0.1.13") // KInference core backend implementation
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
+        }
     }
     val test by getting {
         kotlin.srcDir("src/test/kotlin")
@@ -54,9 +59,8 @@ repositories {
 }
 
 
-// Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
-    implementation("io.kinference", "inference-ort", "0.2.16")
+    implementation("io.kinference", "inference-ort", "0.2.17")
 }
 
 

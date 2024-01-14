@@ -4,9 +4,11 @@ package com.github.dlu19.saroberta
 import com.github.dlu19.saroberta.services.Analyzer
 import com.github.dlu19.saroberta.services.Tokenizer
 import com.intellij.testFramework.TestDataPath
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import java.util.concurrent.CountDownLatch
 
 
 @TestDataPath("src/test/resources")
@@ -42,7 +44,7 @@ class SentimentAnalysisTest {
     }
 
     @Test
-    fun `test tokenizer empty string`(){
+    fun `test tokenizer empty string`() {
         val sentence = ""
         val actualToken = tokenizer.commentTokenizer(sentence).toList()
         Assertions.assertEquals(clsToken, actualToken[0])
@@ -64,10 +66,20 @@ class SentimentAnalysisTest {
 
     // 3 tests on sentiment analyzer features: Binary classification on token input
     @Test
-    fun `test analyzer positive`() {
+    fun `test analyzer positive`() = runBlocking {
         val sentence = "Hello world!"
         val token = tokenizer.commentTokenizer(sentence)
-        val actualPrediction = analyzer.sentimentAnalysis(token)
+        var actualPrediction: Int? = null
+
+        val latch = CountDownLatch(1) // Used to wait for the callback
+
+        analyzer.sentimentAnalysis(token) { result ->
+            actualPrediction = result
+            latch.countDown() // Signal that the result is received
+        }
+
+        latch.await() // Wait for the callback to be called
+
         val expectedPrediction = 1
 
         // Asserting that the extracted tokens match the expected tokens
@@ -79,10 +91,20 @@ class SentimentAnalysisTest {
     }
 
     @Test
-    fun `test analyzer negative`() {
+    fun `test analyzer negative`() = runBlocking {
         val sentence = "Goodbye world!"
         val token = tokenizer.commentTokenizer(sentence)
-        val actualPrediction = analyzer.sentimentAnalysis(token)
+        var actualPrediction: Int? = null
+
+        val latch = CountDownLatch(1) // Used to wait for the callback
+
+        analyzer.sentimentAnalysis(token) { result ->
+            actualPrediction = result
+            latch.countDown() // Signal that the result is received
+        }
+
+        latch.await() // Wait for the callback to be called
+
         val expectedPrediction = 0
 
         // Asserting that the extracted tokens match the expected tokens
@@ -94,22 +116,35 @@ class SentimentAnalysisTest {
     }
 
     @Test
-    fun `test analyzer long string`() {
-        val sentence = "Whenever I met one of them who seemed to me at all clear-sighted, I tried the experiment of \n" +
-                "showing him my Drawing Number One, which I have always kept. I would try to find out, so, if this \n" +
-                "was a person of true understanding. But, whoever it was, he, or she, would always say: “That is a \n" +
-                "hat.” Then I would never talk to that person about boa constrictors, or primeval forests, or stars. I \n" +
-                "would bring myself down to his level. I would talk to him about bridge, and golf, and politics, and \n" +
-                "neckties. And the grown-up would be greatly pleased to have met such a sensible man. "
+    fun `test analyzer long string`() = runBlocking {
+        val sentence =
+            "Whenever I met one of them who seemed to me at all clear-sighted, I tried the experiment of \n" +
+                    "showing him my Drawing Number One, which I have always kept. I would try to find out, so, if this \n" +
+                    "was a person of true understanding. But, whoever it was, he, or she, would always say: “That is a \n" +
+                    "hat.” Then I would never talk to that person about boa constrictors, or primeval forests, or stars. I \n" +
+                    "would bring myself down to his level. I would talk to him about bridge, and golf, and politics, and \n" +
+                    "neckties. And the grown-up would be greatly pleased to have met such a sensible man. "
         val token = tokenizer.commentTokenizer(sentence)
-        val actualPrediction = analyzer.sentimentAnalysis(token)
+        var actualPrediction: Int? = null
+
+        val latch = CountDownLatch(1) // Used to wait for the callback
+
+        analyzer.sentimentAnalysis(token) { result ->
+            actualPrediction = result
+            latch.countDown() // Signal that the result is received
+        }
+
+        latch.await() // Wait for the callback to be called
+
         val expectedPrediction = 0
 
+        // Asserting that the extracted tokens match the expected tokens
         Assertions.assertEquals(
             expectedPrediction,
             actualPrediction,
         )
     }
 }
+
 
 

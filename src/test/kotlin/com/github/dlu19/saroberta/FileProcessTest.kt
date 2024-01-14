@@ -3,6 +3,7 @@ package com.github.dlu19.saroberta
 import com.github.dlu19.saroberta.services.Extractor
 import com.github.dlu19.saroberta.services.ModelLoader
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import java.io.File
 
@@ -35,12 +36,13 @@ class FileProcessTest : BasePlatformTestCase() {
     }
 
     // 1 test on ModelLoader features: Load model from given path and return a ortruntime session
-    fun testModelLoader() {
+
+    fun testONNXModelLoader() =  runBlocking {
         val testFilePath = "testModel.onnx"
         val loader = ModelLoader()
-        val session = loader.loadSession(testFilePath)
+        val model = loader.loadONNXModel(testFilePath)
 
-        Assertions.assertNotNull(session, "The model was not loaded")
+        Assertions.assertNotNull(model, "The model was not loaded")
     }
     override fun getTestDataPath() = "src/test/testData/rename"
 

@@ -20,9 +20,9 @@ class SentimentAnalysisAction() : AnAction("Perform Sentiment Analysis") {
         if (selectedFiles != null) {
             for (file in selectedFiles) {
                 // Instantiation of essential services
-                val extractorService = e.project?.service<Extractor>()
-                val tokenizerService = e.project?.service<Tokenizer>()
-                val analyzerService = e.project?.service<Analyzer>()
+                val extractorService = e.project?.let { Extractor(it) }
+                val tokenizerService = Tokenizer()
+                val analyzerService = Analyzer()
                 val loader = Loader()
 
                 val comments = extractorService?.commentExtractor(file)
@@ -34,8 +34,16 @@ class SentimentAnalysisAction() : AnAction("Perform Sentiment Analysis") {
                         //Get the token of each comment
                         val commentText = comment.text
                         val token = tokenizerService?.commentTokenizer(commentText)
-                        val prediction = token?.let { analyzerService?.sentimentAnalysis(it) }
-                        commentSentimentMap[comment] = prediction
+                        token?.let {
+                            analyzerService?.sentimentAnalysis(it) { result ->
+                                // Handle the result here
+                                val prediction = result
+                                commentSentimentMap[comment] = prediction
+                                // You can now use 'prediction' inside this scope
+                                println("Prediction: $prediction")
+                            }
+                        }
+
                     }
                 }
 
