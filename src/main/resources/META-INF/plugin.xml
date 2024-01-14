@@ -1,18 +1,37 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.dlu19.saroberta</id>
-    <name>sa_roberta Template</name>
-    <vendor>d-lu-19</vendor>
+    <id>roberta.sentiment</id>
+    <name>CommentSentimentAnalyzer</name>
+    <vendor>Dongxu Lu</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
+    <depends>org.jetbrains.kotlin</depends>
+
     <resource-bundle>messages.MyBundle</resource-bundle>
 
+
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.dlu19.saroberta.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+        <toolWindow icon = "/icons/icon.png" factoryClass="com.github.dlu19.saroberta.toolWindow.SAToolWindowFactory"
+                    id="Sentiment Analysis"
+                    anchor="right" secondary="false"/>
     </extensions>
 
-    <applicationListeners>
-        <listener class="com.github.dlu19.saroberta.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>
-    </applicationListeners>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <codeInsight.inlayProvider language="kotlin"
+                                   implementationClass="com.github.dlu19.saroberta.actions.SentimentInlayHintProvider"/>
+    </extensions>
+
+    <actions>
+        <action icon="/icons/icon.png" id="SentimentAnalysisAction" class="com.github.dlu19.saroberta.actions.SentimentAnalysisAction" text="Sentiment Analysis" description="Perform sentiment analysis">
+            <add-to-group group-id="MainMenu" anchor="last"/>
+        </action>
+
+        <action icon="/icons/icon.png" id="RunMenuAction" class="com.github.dlu19.saroberta.actions.PopMenuAction" text="Sentiment Analysis" description="Perform sentiment analysis on the current file">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+
+    </actions>
+
 </idea-plugin>
