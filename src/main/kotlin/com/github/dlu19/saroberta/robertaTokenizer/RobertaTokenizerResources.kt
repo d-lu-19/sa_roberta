@@ -4,9 +4,6 @@ import com.genesys.roberta.tokenizer.BiGram
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.util.containers.reverse
-import kotlinx.html.ARel.index
-import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -18,11 +15,20 @@ class RobertaTokenizerResources(FILE_NAME_LIST: List<String?>) {
     private lateinit var vocabularyMap: Map<String, Long>
     private lateinit var bpeRanks: Map<BiGram, Int>
 
-    init{
+    init {
         loadResourceStream(FILE_NAME_LIST)
-        thisLogger().info("Tokenizer Resources was successfully loaded.")
+        thisLogger().info("Tokenizer Resources were successfully loaded.")
     }
 
+    companion object {
+        private var instance: RobertaTokenizerResources? = null
+
+        fun getInstance(FILE_NAME_LIST: List<String?>): RobertaTokenizerResources {
+            return instance ?: synchronized(this) {
+                instance ?: RobertaTokenizerResources(FILE_NAME_LIST).also { instance = it }
+            }
+        }
+    }
 
     private fun getResourceStream(fileNames: List<String?>): List<InputStream> {
         return fileNames.mapNotNull { fileName ->
@@ -41,19 +47,26 @@ class RobertaTokenizerResources(FILE_NAME_LIST: List<String?>) {
 
     private fun loadBaseVocabularyStream(inputStream: InputStream): Map<Int, String> {
         return try {
-            val type = object : TypeToken<HashMap<Int, String>>() {}.type
-            Gson().fromJson(InputStreamReader(inputStream), type)
+            // Define the correct type token for Gson
+            val type = object : TypeToken<Map<Int, String>>() {}.type
+            val reader = InputStreamReader(inputStream, StandardCharsets.UTF_8)
+            val tempMap: Map<Int, String> = Gson().fromJson(reader, type)
+            tempMap
         } catch (e: IOException) {
-            throw IllegalStateException("Failed to load base vocabulary map for Roberta from InputStream", e)
+            throw IllegalStateException("Failed to load vocabulary map from InputStream", e)
         }
     }
 
+
     private fun loadVocabularyStream(inputStream: InputStream): Map<String, Long> {
         return try {
-            val type = object : TypeToken<HashMap<String, Long>>() {}.type
-            Gson().fromJson(InputStreamReader(inputStream), type)
+            // Define the correct type token for Gson
+            val type = object : TypeToken<Map<String, Long>>() {}.type
+            val reader = InputStreamReader(inputStream, StandardCharsets.UTF_8)
+            val tempMap: Map<String, Long> = Gson().fromJson(reader, type)
+            tempMap
         } catch (e: IOException) {
-            throw IllegalStateException("Failed to load vocabulary map for Roberta from InputStream", e)
+            throw IllegalStateException("Failed to load vocabulary map from InputStream", e)
         }
     }
 

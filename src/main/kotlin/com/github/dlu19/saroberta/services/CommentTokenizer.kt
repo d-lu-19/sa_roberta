@@ -8,7 +8,6 @@ import com.intellij.openapi.diagnostic.thisLogger
 // Tokenize the comment text as input suitable for roberta model
 @Service(Service.Level.PROJECT)
 class Tokenizer() {
-
     // Load the necessary files for building robertaTokenizer
     object FileConstants {
         const val BASE_VOCABULARY_FILE_NAME = "test-vocabularies/base_vocabulary.json"
@@ -23,8 +22,9 @@ class Tokenizer() {
         FileConstants.VOCABULARY_FILE_NAME,
         FileConstants.MERGES_FILE_NAME)
 
-    private val robertaTokenizerResources = RobertaTokenizerResources(FILE_NAME_LIST)
+    private val robertaTokenizerResources = RobertaTokenizerResources.getInstance(FILE_NAME_LIST)
     private val robertaTokenizer = RobertaTokenizer(robertaTokenizerResources)
+
 
     // Obtain the token for comment text
     fun commentTokenizer(comment: String): LongArray {

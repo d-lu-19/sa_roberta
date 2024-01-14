@@ -29,11 +29,6 @@ sourceSets {
     val main by getting {
         kotlin.srcDir("src/main/kotlin")
         resources.srcDir("src/main/resources")
-        dependencies {
-            implementation(kotlin("stdlib-common"))
-            implementation("io.kinference:inference-core:0.1.13") // KInference core backend implementation
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
-        }
     }
     val test by getting {
         kotlin.srcDir("src/test/kotlin")

@@ -33,7 +33,7 @@ class SentimentAnalysisTest {
     fun `test tokenizer`() {
         val sentence = "Hello world!"
         val actualToken = tokenizer.commentTokenizer(sentence).toList()
-        val expectedToken = listOf(0L, 31414L, 3L, 328L, 2L)
+        val expectedToken = listOf(0L, 31414L, 232L, 328L, 2L)
 
         // Asserting that the extracted tokens match the expected tokens
         Assertions.assertEquals(
@@ -69,17 +69,7 @@ class SentimentAnalysisTest {
     fun `test analyzer positive`() = runBlocking {
         val sentence = "Hello world!"
         val token = tokenizer.commentTokenizer(sentence)
-        var actualPrediction: Int? = null
-
-        val latch = CountDownLatch(1) // Used to wait for the callback
-
-        analyzer.sentimentAnalysis(token) { result ->
-            actualPrediction = result
-            latch.countDown() // Signal that the result is received
-        }
-
-        latch.await() // Wait for the callback to be called
-
+        val actualPrediction = analyzer.sentimentAnalysis(token)
         val expectedPrediction = 1
 
         // Asserting that the extracted tokens match the expected tokens
@@ -94,16 +84,7 @@ class SentimentAnalysisTest {
     fun `test analyzer negative`() = runBlocking {
         val sentence = "Goodbye world!"
         val token = tokenizer.commentTokenizer(sentence)
-        var actualPrediction: Int? = null
-
-        val latch = CountDownLatch(1) // Used to wait for the callback
-
-        analyzer.sentimentAnalysis(token) { result ->
-            actualPrediction = result
-            latch.countDown() // Signal that the result is received
-        }
-
-        latch.await() // Wait for the callback to be called
+        val actualPrediction = analyzer.sentimentAnalysis(token)
 
         val expectedPrediction = 0
 
@@ -125,16 +106,7 @@ class SentimentAnalysisTest {
                     "would bring myself down to his level. I would talk to him about bridge, and golf, and politics, and \n" +
                     "neckties. And the grown-up would be greatly pleased to have met such a sensible man. "
         val token = tokenizer.commentTokenizer(sentence)
-        var actualPrediction: Int? = null
-
-        val latch = CountDownLatch(1) // Used to wait for the callback
-
-        analyzer.sentimentAnalysis(token) { result ->
-            actualPrediction = result
-            latch.countDown() // Signal that the result is received
-        }
-
-        latch.await() // Wait for the callback to be called
+        val actualPrediction = analyzer.sentimentAnalysis(token)
 
         val expectedPrediction = 0
 

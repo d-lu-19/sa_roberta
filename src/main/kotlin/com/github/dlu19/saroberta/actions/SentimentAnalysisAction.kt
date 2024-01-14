@@ -8,6 +8,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.ui.Messages
 import com.intellij.psi.PsiComment
+import kotlinx.coroutines.runBlocking
 import javax.swing.ImageIcon
 import javax.swing.table.DefaultTableModel
 
@@ -33,15 +34,12 @@ class SentimentAnalysisAction() : AnAction("Perform Sentiment Analysis") {
                         //Get the token of each comment
                         val commentText = comment.text
                         val token = tokenizerService?.commentTokenizer(commentText)
-                        token?.let {
-                            analyzerService?.sentimentAnalysis(it) { result ->
-                                // Mapping the comment and its prediction
-                                val prediction = result
-                                commentSentimentMap[comment] = prediction
-                                thisLogger().info(" The prediction of comment ${comment.text} is $prediction")
-                            }
-                        }
 
+                        runBlocking {
+                            val prediction = token?.let { analyzerService.sentimentAnalysis(it) }
+                            commentSentimentMap[comment] = prediction
+                            thisLogger().info(" The prediction of comment ${comment.text} is $prediction")
+                        }
                     }
                 }
 
@@ -56,7 +54,7 @@ class SentimentAnalysisAction() : AnAction("Perform Sentiment Analysis") {
 
                 // Update the sentiment analysis result mapping to the table content
                 e.project?.let { MapParser.updateComSenMap(commentSentimentMap) }
-                val tableModel = loader?.tableLoader(commentSentimentMap)
+                val tableModel = e.project?.let { loader?.tableLoader(commentSentimentMap, it) }
                 fileTableMap[file.name] = tableModel
             }
             // Update table content
