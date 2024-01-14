@@ -11,10 +11,9 @@ import java.nio.LongBuffer
 @Service(Service.Level.PROJECT)
 //Perform Sentiment Analysis based on the token
 class Analyzer : CoroutineScope by CoroutineScope(Dispatchers.Default) {
-    fun sentimentAnalysis(token: LongArray, callback: (Int) -> Unit) {
-        launch {
+    suspend fun sentimentAnalysis(token: LongArray): Int {
             // Load roberta model
-            val modelLoader = ModelLoader()
+            val modelLoader = ModelLoader.getInstance()
             val modelPath = "model/roberta-sequence-classification-9.onnx"
             val model = modelLoader.loadONNXModel(modelPath)
 
@@ -36,8 +35,7 @@ class Analyzer : CoroutineScope by CoroutineScope(Dispatchers.Default) {
             val result = probabilities.indices.maxByOrNull { probabilities[it] } ?: -1
 
             // Invoke the callback with the result
-            callback(result)
+            return result
         }
     }
 
-}

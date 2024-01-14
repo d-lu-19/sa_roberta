@@ -39,7 +39,7 @@ class FileProcessTest : BasePlatformTestCase() {
 
     fun testONNXModelLoader() =  runBlocking {
         val testFilePath = "testModel.onnx"
-        val loader = ModelLoader()
+        val loader = ModelLoader.getInstance()
         val model = loader.loadONNXModel(testFilePath)
 
         Assertions.assertNotNull(model, "The model was not loaded")
