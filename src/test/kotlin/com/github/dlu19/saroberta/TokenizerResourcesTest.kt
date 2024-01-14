@@ -3,12 +3,13 @@ package com.github.dlu19.saroberta
 import com.genesys.roberta.tokenizer.BiGram
 import com.github.dlu19.saroberta.robertaTokenizer.RobertaTokenizer
 import com.github.dlu19.saroberta.robertaTokenizer.RobertaTokenizerResources
+import com.intellij.testFramework.TestDataPath
 import junit.framework.TestCase.assertNotNull
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 
-
+@TestDataPath("src/test/resources")
 class RobertaTokenizerResourcesTest {
 
     companion object {
@@ -30,6 +31,7 @@ class RobertaTokenizerResourcesTest {
         }
     }
 
+    // 6 tests on TokenizerResources features: Convert characters to Bigram, Get index of character and Bigram
     @Test
     fun `test min byte value encoding`() {
         val key: Byte = -128

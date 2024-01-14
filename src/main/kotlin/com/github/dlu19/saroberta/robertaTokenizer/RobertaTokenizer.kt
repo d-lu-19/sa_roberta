@@ -12,7 +12,6 @@ class RobertaTokenizer(
     private val bytePairEncoder = BytePairEncoder()
 
     fun tokenize(sentence: String): LongArray {
-        println("The current comment: $sentence")
         val encodedStrings = mutableListOf<String>()
 
         val matcher = PATTERN.matcher(sentence)
@@ -27,8 +26,6 @@ class RobertaTokenizer(
 
             encodedStrings.add(matchedSequenceEncoded.toString())
         }
-
-        println(encodedStrings)
 
         val outputTokens = encodedStrings.asSequence()
             // Returns list of strings ready for vocabulary mapping

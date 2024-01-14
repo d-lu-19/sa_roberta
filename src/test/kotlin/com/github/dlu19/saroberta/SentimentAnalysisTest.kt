@@ -9,8 +9,8 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 
 
-@TestDataPath("src/test/testData")
-class MyPluginTest {
+@TestDataPath("src/test/resources")
+class SentimentAnalysisTest {
 
     companion object {
         lateinit var tokenizer: Tokenizer

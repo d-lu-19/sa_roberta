@@ -1,13 +1,11 @@
-package com.github.dlu19.saroberta.services
+package com.github.dlu19.saroberta.toolWindow
 
-
-import com.intellij.openapi.components.Service
 import com.intellij.psi.PsiComment
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.table.JBTable
 import javax.swing.table.DefaultTableModel
 
-@Service(Service.Level.PROJECT)
+
 class Loader() {
     fun scrollpaneLoader(model: DefaultTableModel): JBScrollPane {
         val table = JBTable(model)

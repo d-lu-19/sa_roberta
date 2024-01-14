@@ -2,7 +2,6 @@ package com.github.dlu19.saroberta.toolWindow
 
 import com.github.dlu19.saroberta.listeners.FileSelectionListener
 import com.github.dlu19.saroberta.listeners.FileTableMapListener
-import com.github.dlu19.saroberta.services.Loader
 import com.github.dlu19.saroberta.services.MapParser
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
@@ -24,9 +23,11 @@ class SAToolWindowFactory : ToolWindowFactory, FileTableMapListener {
     private var project: Project? = null
     private var loaderService: Loader? = null
 
+
+    // Display content to the tool window
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         this.project = project
-        this.loaderService = project.service<Loader>()
+        this.loaderService = Loader()
         this.tabbedPane = JBTabbedPane()
 
         MapParser.setListener(this)
@@ -37,11 +38,13 @@ class SAToolWindowFactory : ToolWindowFactory, FileTableMapListener {
         toolWindow.contentManager.addContent(content)
     }
 
+    // Refresh the result table each time results of sentiment analysis are retrieved
     override fun onFileTableMapUpdated() {
-        project?.let { loadTabbedPane(it) }
+        loadTabbedPane()
     }
 
-    private fun loadTabbedPane(project: Project) {
+    // Load sentiment analysis results into tables, each tab for a selected file
+    private fun loadTabbedPane() {
         tabbedPane.removeAll()
         loaderService?.let { loader ->
             MapParser.getFileTableMap().forEach { (filename, model) ->
@@ -53,6 +56,7 @@ class SAToolWindowFactory : ToolWindowFactory, FileTableMapListener {
         }
     }
 
+    // Create a file chooser
     private fun createFileChooser(panel: JPanel, project: Project): JFileChooser {
         // Create and define the default root for FileChooser as project root
         val projectBasePath = project.basePath
@@ -89,6 +93,7 @@ class SAToolWindowFactory : ToolWindowFactory, FileTableMapListener {
         return fileChooser
     }
 
+    // Add main UI components to the tool window
     private fun createToolWindowPanel(project: Project): JComponent? {
 
         // Initializing panel for the plugin

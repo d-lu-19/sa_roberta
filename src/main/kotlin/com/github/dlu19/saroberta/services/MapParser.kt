@@ -4,7 +4,7 @@ import com.github.dlu19.saroberta.listeners.FileTableMapListener
 import com.intellij.psi.PsiComment
 import javax.swing.table.DefaultTableModel
 
-//Function: Parse the Mapping of comment and sentiment prediction
+//Function: Parse the Mappings of comment and sentiment prediction, file and its analysis results
 object MapParser {
 
     private var commentSentimentMap: Map<PsiComment, Int?> = emptyMap()
@@ -30,7 +30,7 @@ object MapParser {
 
     fun updateFileTableMap(newResults: Map<String, DefaultTableModel?>){
         fileTableMap = newResults
-        notifyListener()
+        notifyListener() // Upon results update, initiate listener for updating results display on the tool window
     }
 
     fun getFileTableMap(): Map<String, DefaultTableModel?> {

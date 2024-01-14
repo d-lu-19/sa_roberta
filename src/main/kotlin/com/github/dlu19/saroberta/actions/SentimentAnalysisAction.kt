@@ -2,6 +2,7 @@ package com.github.dlu19.saroberta.actions
 
 import com.github.dlu19.saroberta.listeners.FileHolder
 import com.github.dlu19.saroberta.services.*
+import com.github.dlu19.saroberta.toolWindow.Loader
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
@@ -11,10 +12,9 @@ import javax.swing.ImageIcon
 import javax.swing.table.DefaultTableModel
 
 
-class SentimentAnalysisAction() : AnAction("Sentiment Analysis On Current File") {
-
+class SentimentAnalysisAction() : AnAction("Perform Sentiment Analysis") {
     override fun actionPerformed(e: AnActionEvent) {
-        val selectedFiles = FileHolder.selectedFiles
+        val selectedFiles = FileHolder.selectedFiles // Load selected files
         val fileTableMap = mutableMapOf<String, DefaultTableModel?>()
 
         if (selectedFiles != null) {
@@ -23,7 +23,7 @@ class SentimentAnalysisAction() : AnAction("Sentiment Analysis On Current File")
                 val extractorService = e.project?.service<Extractor>()
                 val tokenizerService = e.project?.service<Tokenizer>()
                 val analyzerService = e.project?.service<Analyzer>()
-                val loaderService = e.project?.service<Loader>()
+                val loader = Loader()
 
                 val comments = extractorService?.commentExtractor(file)
                 val commentSentimentMap = mutableMapOf<PsiComment, Int?>()
@@ -49,7 +49,7 @@ class SentimentAnalysisAction() : AnAction("Sentiment Analysis On Current File")
                 }
                 e.project?.let { MapParser.updateComSenMap(commentSentimentMap) }
 
-                val tableModel = loaderService?.tableLoader(commentSentimentMap)
+                val tableModel = loader?.tableLoader(commentSentimentMap)
                 fileTableMap[file.name] = tableModel
             }
             MapParser.updateFileTableMap(fileTableMap)

@@ -20,6 +20,7 @@ plugins {
 }
 
 
+
 group = properties("pluginGroup").get()
 version = properties("pluginVersion").get()
 
@@ -30,6 +31,7 @@ sourceSets {
         resources.srcDir("src/main/resources")
     }
     val test by getting {
+        kotlin.srcDir("src/test/kotlin")
         resources.srcDir("src/test/resources")
     }
 }
@@ -57,23 +59,14 @@ dependencies {
     implementation("io.kinference", "inference-ort", "0.2.16")
 }
 
-dependencies {
-    // Other dependencies...
-
-    // Add Mockito dependency for testing
-    testImplementation("org.mockito:mockito-core:4.0.0")// Use the latest version available
-}
-
 
 dependencies {
+    testImplementation("junit:junit:4.13.2")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.2")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.8.2")
 }
 
-
-//dependencies {
-//    implementation("cloud.genesys:roberta-tokenizer:1.0.6")
-//}
 
 // Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.
 kotlin {
@@ -117,6 +110,8 @@ koverReport {
         }
     }
 }
+
+
 tasks.test {
     useJUnitPlatform()
 }
@@ -159,6 +154,10 @@ tasks {
     }
 
     project.tasks.named("processResources", Copy::class.java) {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    project.tasks.named("processTestResources", Copy::class.java) {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 

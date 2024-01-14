@@ -1,17 +1,13 @@
 package com.github.dlu19.saroberta.actions
 import com.github.dlu19.saroberta.listeners.FileHolder
-import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.ui.Messages
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.psi.PsiManager
 import java.io.File
 
-class RunMenuAction () : AnAction() {
-
+// Action triggered from EditorPopMenu, extends the action for sentiment analysis
+class PopMenuAction () : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val fileEditorManager = e.project?.let { FileEditorManager.getInstance(it) }
         val currentFile = fileEditorManager?.selectedFiles?.firstOrNull()
@@ -20,19 +16,11 @@ class RunMenuAction () : AnAction() {
             // Add the current file to FileHolder
             FileHolder.selectedFiles = listOf(File(currentFile.path))
 
+            // Reload the file to trigger InlayHintProvider
             if (currentFile?.let { fileEditorManager.isFileOpen(it) } == true) {
-                // Close the file if it's already open
-                currentFile?.let { fileEditorManager.closeFile(it) }
+                currentFile?.let { fileEditorManager.closeFile(it) } // Close the file if it's already open
             }
-
-            // Open the file (this will reopen it if it was already open)
             currentFile?.let { fileEditorManager.openFile(it, true) }
-
-//            val psiManager = PsiManager.getInstance(e.project!!)
-//            val psiFile = currentFile?.let { psiManager.findFile(it) }
-//            if (psiFile != null) {
-//                DaemonCodeAnalyzer.getInstance(e.project).restart(psiFile)
-//            }
 
             val sentimentAnalysisAction = SentimentAnalysisAction()
             sentimentAnalysisAction.actionPerformed(e)
