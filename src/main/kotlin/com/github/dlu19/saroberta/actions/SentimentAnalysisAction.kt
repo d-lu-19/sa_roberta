@@ -5,7 +5,7 @@ import com.github.dlu19.saroberta.services.*
 import com.github.dlu19.saroberta.toolWindow.Loader
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.ui.Messages
 import com.intellij.psi.PsiComment
 import javax.swing.ImageIcon
@@ -24,7 +24,6 @@ class SentimentAnalysisAction() : AnAction("Perform Sentiment Analysis") {
                 val tokenizerService = Tokenizer()
                 val analyzerService = Analyzer()
                 val loader = Loader()
-
                 val comments = extractorService?.commentExtractor(file)
                 val commentSentimentMap = mutableMapOf<PsiComment, Int?>()
 
@@ -36,11 +35,10 @@ class SentimentAnalysisAction() : AnAction("Perform Sentiment Analysis") {
                         val token = tokenizerService?.commentTokenizer(commentText)
                         token?.let {
                             analyzerService?.sentimentAnalysis(it) { result ->
-                                // Handle the result here
+                                // Mapping the comment and its prediction
                                 val prediction = result
                                 commentSentimentMap[comment] = prediction
-                                // You can now use 'prediction' inside this scope
-                                println("Prediction: $prediction")
+                                thisLogger().info(" The prediction of comment ${comment.text} is $prediction")
                             }
                         }
 
@@ -55,11 +53,13 @@ class SentimentAnalysisAction() : AnAction("Perform Sentiment Analysis") {
                         ImageIcon(javaClass.getResource("/icons/thinking.png"))
                     )
                 }
-                e.project?.let { MapParser.updateComSenMap(commentSentimentMap) }
 
+                // Update the sentiment analysis result mapping to the table content
+                e.project?.let { MapParser.updateComSenMap(commentSentimentMap) }
                 val tableModel = loader?.tableLoader(commentSentimentMap)
                 fileTableMap[file.name] = tableModel
             }
+            // Update table content
             MapParser.updateFileTableMap(fileTableMap)
 
         }

@@ -3,6 +3,7 @@ package com.github.dlu19.saroberta.robertaTokenizer
 import com.genesys.roberta.tokenizer.BiGram
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.util.containers.reverse
 import kotlinx.html.ARel.index
 import java.io.File
@@ -19,12 +20,14 @@ class RobertaTokenizerResources(FILE_NAME_LIST: List<String?>) {
 
     init{
         loadResourceStream(FILE_NAME_LIST)
+        thisLogger().info("Tokenizer Resources was successfully loaded.")
     }
 
 
     private fun getResourceStream(fileNames: List<String?>): List<InputStream> {
         return fileNames.mapNotNull { fileName ->
             this::class.java.classLoader.getResourceAsStream(fileName)
+                ?: throw IllegalStateException("File not found for path: $fileName")
         }
     }
 
