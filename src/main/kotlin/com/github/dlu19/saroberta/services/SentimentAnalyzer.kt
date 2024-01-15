@@ -4,20 +4,23 @@ import ai.onnxruntime.OnnxTensor
 import ai.onnxruntime.OrtEnvironment
 import com.intellij.openapi.components.Service
 import io.kinference.ort.data.utils.createORTData
+import io.kinference.ort.model.ORTModel
 import kotlinx.coroutines.*
 import java.nio.LongBuffer
 
 
 @Service(Service.Level.PROJECT)
 //Perform Sentiment Analysis based on the token
-class Analyzer : CoroutineScope by CoroutineScope(Dispatchers.Default) {
-    suspend fun sentimentAnalysis(token: LongArray): Int {
-            // Load roberta model
-            val modelLoader = ModelLoader.getInstance()
+class Analyzer{
+        private val modelLoader = ModelLoader()
+        private val modelDeferred: Deferred<ORTModel> = CoroutineScope(Dispatchers.Default).async {
             val modelPath = "model/roberta-sequence-classification-9.onnx"
-            val model = modelLoader.loadONNXModel(modelPath)
+            modelLoader.loadONNXModel(modelPath)
+        }
 
+    suspend fun sentimentAnalysis(token: LongArray): Int {
             // convert token into int64 tensor as model input
+            val model = modelDeferred.await()
             val longBuffer = LongBuffer.wrap(token)
             val env = OrtEnvironment.getEnvironment()
             val tensor = OnnxTensor.createTensor(env, longBuffer, longArrayOf(1, token.size.toLong()))

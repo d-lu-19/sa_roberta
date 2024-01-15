@@ -23,7 +23,7 @@ class FileProcessTest : BasePlatformTestCase() {
         val extractor = Extractor(project)
         val comments = extractor.commentExtractor(testFile)
 
-        Assertions.assertEquals(3, comments.size, "Expected number of comments did not match")
+        Assertions.assertEquals(2, comments.size, "Expected number of comments did not match")
     }
 
     fun testEmptyCommentExtractor() {
@@ -39,12 +39,12 @@ class FileProcessTest : BasePlatformTestCase() {
 
     fun testONNXModelLoader() =  runBlocking {
         val testFilePath = "testModel.onnx"
-        val loader = ModelLoader.getInstance()
+        val loader = ModelLoader()
         val model = loader.loadONNXModel(testFilePath)
 
         Assertions.assertNotNull(model, "The model was not loaded")
     }
-    override fun getTestDataPath() = "src/test/testData/rename"
+    override fun getTestDataPath() = "src/test/resources"
 
 
 }

@@ -15,15 +15,9 @@ class PopMenuAction () : AnAction() {
         if (currentFile != null) {
             // Add the current file to FileHolder
             FileHolder.selectedFiles = listOf(File(currentFile.path))
-
-            // Reload the file to trigger InlayHintProvider
-            if (currentFile?.let { fileEditorManager.isFileOpen(it) } == true) {
-                currentFile?.let { fileEditorManager.closeFile(it) } // Close the file if it's already open
-            }
-            currentFile?.let { fileEditorManager.openFile(it, true) }
-
             val sentimentAnalysisAction = SentimentAnalysisAction()
             sentimentAnalysisAction.actionPerformed(e)
+
         } else {
             // Handle the case when no file is currently open
             Messages.showMessageDialog(

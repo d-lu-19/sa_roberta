@@ -1,6 +1,10 @@
 package com.github.dlu19.saroberta.robertaTokenizer
 
-import com.genesys.roberta.tokenizer.BiGram
+/**
+ * This file contains code based on RoBERTa Java Tokenizer
+ * Source: https://github.com/purecloudlabs/roberta-tokenizer
+ */
+
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.intellij.openapi.diagnostic.thisLogger
