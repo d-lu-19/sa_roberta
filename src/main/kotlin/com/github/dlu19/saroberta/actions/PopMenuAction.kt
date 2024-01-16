@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.ui.Messages
 import java.io.File
+import javax.swing.JOptionPane
 
 // Action triggered from EditorPopMenu, extends the action for sentiment analysis
 class PopMenuAction () : AnAction() {
@@ -13,18 +14,29 @@ class PopMenuAction () : AnAction() {
         val currentFile = fileEditorManager?.selectedFiles?.firstOrNull()
 
         if (currentFile != null) {
-            // Add the current file to FileHolder
-            FileHolder.selectedFiles = listOf(File(currentFile.path))
-            val sentimentAnalysisAction = SentimentAnalysisAction()
-            sentimentAnalysisAction.actionPerformed(e)
+            val filePath = currentFile.path
+            if (filePath.endsWith(".kt", ignoreCase = true)) {
+                // It's a Kotlin file
+                FileHolder.selectedFiles = listOf(File(filePath))
+                val sentimentAnalysisAction = SentimentAnalysisAction()
+                sentimentAnalysisAction.actionPerformed(e)
+            } else {
+                // It's not a Kotlin file, inform the user
+                JOptionPane.showMessageDialog(
+                    null,
+                    "The selected file is not a Kotlin file.",
+                    "File Type Error",
+                    JOptionPane.ERROR_MESSAGE
+                )
+            }
 
         } else {
             // Handle the case when no file is currently open
-            Messages.showMessageDialog(
-                e.project,
+            JOptionPane.showMessageDialog(
+                null,
                 "No file selected.",
                 "Information",
-                Messages.getInformationIcon()
+                JOptionPane.ERROR_MESSAGE
             )
         }
     }

@@ -2,12 +2,14 @@
 
 ## Overview
 
-
-
 <!-- Plugin description -->
-**Comment Sentiment Analyzer** is a plugin for IntelliJ IDEA that perform binary sentiment classification on comments from Kotlin files. 
+This is the source code repo for **Comment Sentiment Analyzer** , a plugin for IntelliJ IDEA platform that performs binary sentiment classification on comments from Kotlin files. 
 The plugin implements **a pipeline sentiment analysis work**, including comment extraction, preprocessing comment text, text tokenization, prediction using pre-trained roberta model and prediction visualization.
 Development of this plugin uses the [Intellij Platform Plugin Template][gh:template].
+
+
+[gh:template]: https://github.com/JetBrains/intellij-platform-plugin-template?tab=readme-ov-file#getting-started
+<!-- Plugin description end -->
 
 This README will cover the following content:
 <!-- TOC -->
@@ -15,12 +17,8 @@ This README will cover the following content:
   * [Overview](#overview)
   * [Prerequisites](#prerequisites)
   * [Environment Setup](#environment-setup)
-  * [Testing the Plugin](#testing-the-plugin)
-  * [Running the Plugin](#running-the-plugin)
-  * [Main Features](#main-features)
-    * [1. Plugin Entries](#1-plugin-entries)
-    * [2. File Selection](#2-file-selection)
-    * [3. Sentiment Analysis Statistics Display](#3-sentiment-analysis-statistics-display)
+  * [Testing](#testing)
+  * [Running](#running)
   * [Troubleshooting](#troubleshooting)
       * [1. Duplicate Handling Strategy](#1-duplicate-handling-strategy)
       * [2. Resource Loading with JAR Application](#2-resource-loading-with-jar-application)
@@ -29,11 +27,6 @@ This README will cover the following content:
       * [5. Tokenizer Dependencies](#5-tokenizer-dependencies)
   * [Acknowledgments](#acknowledgments)
 <!-- TOC -->
-
-
-
-[gh:template]: https://github.com/JetBrains/intellij-platform-plugin-template?tab=readme-ov-file#getting-started
-<!-- Plugin description end -->
 
 ---
 
@@ -50,11 +43,9 @@ Before you begin, ensure you have the following installed:
    ```sh
    git clone https://github.com/d-lu-19/sa_roberta.git
    ```
-2. [**OPTIONAL**] Download the testProject from [here][gh:project], which includes 1 Java file and 2 Kotlin files, 
-to test the [main features](#main-features) of the plugin.
 
 [gh:project]: https://drive.google.com/file/d/1SmPjZ4gmg4QVQozXJcZmg5igEhkK8rbB/view?usp=sharing 
-3. Run the command in the terminal to initiate the plugin
+2. Run the command in the terminal to initiate the plugin
    ```sh
    ./gradlew build
    ```
@@ -62,7 +53,7 @@ to test the [main features](#main-features) of the plugin.
 
 ---
 
-## Testing the Plugin
+## Testing
 
 Run the command in the terminal to run tests.
    ```sh
@@ -86,7 +77,7 @@ This will run three tests built for testing plugin functions, including:
 
 ---
 
-## Running the Plugin
+## Running
 This will launch a new instance of IntelliJ IDEA with the plugin installed.
 
 1. Run the command in the terminal to initiate the plugin **or** Select run configuration -> Click `Run > Run 'Run MyPlugin'`.
@@ -95,33 +86,6 @@ This will launch a new instance of IntelliJ IDEA with the plugin installed.
    ```
 
 2. Open a Kotlin project in the launched IntelliJ IDEA instance
-
----
-
-## Main Features
-
-This section provides illustrations on the main features of the plugin front-end.
-
-### 1. Plugin Entries
-   
-**Option 1**: Click `View > Tool Window > Sentiment Analysis`, this will open the plugin window on the right
-   ![](images\window_entry.png)
-
-**Option 2**: If you already have a Kotlin file open in the editor, right click on the file, click `Sentiment Analysis`. This will
-  initiate comment sentiment analysis on the current file.
-    ![](images\popmenu_entry.png)
-
-### 2. File Selection
-Select kotlin file(s) in the file chooser and confirm performing comment sentiment analysis on the selected file(s).
-
-Note that The default path of the file chooser is set to the root of current project.
-
-### 3. Sentiment Analysis Statistics Display
-The sentiment statistics of comments will be displayed through
-- Inlay hints aligned to the comment
-- Statistics table(s) on the plugin window, each tab contain statistics for one selected file
-
-   ![](images\stats_display.png)
 
 ---
 

@@ -59,9 +59,11 @@ class SentimentInlayHintProvider : InlayHintsProvider<SentimentInlayHintProvider
     override fun onComSenMapUpdated() {
         myPsiFile?.let { DaemonCodeAnalyzer.getInstance(myProject).restart(it) }
         val virtualFile = myPsiFile?.virtualFile
-        if (virtualFile != null) {
-            myProject?.let { FileEditorManager.getInstance(it).openFile(virtualFile, true) }
+        val fileEditorManager = myProject?.let { FileEditorManager.getInstance(it) }
+        if (virtualFile?.let { fileEditorManager?.isFileOpen(it) } == true) {
+            virtualFile?.let { fileEditorManager?.closeFile(it) } // Close the file if it's already open
         }
+        virtualFile?.let { fileEditorManager?.openFile(it, true) }
     }
 
 
