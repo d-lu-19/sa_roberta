@@ -7,18 +7,7 @@ import java.io.File
 
 
 //Load the roberta model in resources
-class ModelLoader private constructor() {
-
-    companion object {
-        private var instance: ModelLoader? = null
-
-        fun getInstance(): ModelLoader {
-            return instance ?: synchronized(this) {
-                instance ?: ModelLoader().also { instance = it }
-            }
-        }
-    }
-
+class ModelLoader() {
     suspend fun loadONNXModel(path: String): ORTModel {
         // Load inputstream of model and save as temp file
         val modelInputStream = this::class.java.classLoader.getResourceAsStream(path)

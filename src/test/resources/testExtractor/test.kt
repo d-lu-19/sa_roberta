@@ -1,10 +1,11 @@
-fun main() {
+import java.time.LocalDateTime
+
+fun main(args: Array<String>) {
+
     // This is a comment
-    println("Hello world!")
+    val current = LocalDateTime.now()
     // This is another comment
-    println("Hello world!\n")
-    /* This is a comment too */
-    println("Hello world!\n")
+    println("Current Date and Time is: $current")
 }
 
 

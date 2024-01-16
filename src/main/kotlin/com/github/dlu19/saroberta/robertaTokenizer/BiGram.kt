@@ -1,4 +1,9 @@
-package com.genesys.roberta.tokenizer
+package com.github.dlu19.saroberta.robertaTokenizer
+
+/**
+ * This file contains code based on RoBERTa Java Tokenizer
+ * Source: https://github.com/purecloudlabs/roberta-tokenizer
+ */
 
 import com.google.common.base.Preconditions
 import groovy.transform.EqualsAndHashCode

@@ -33,10 +33,10 @@ class SentimentAnalysisAction() : AnAction("Perform Sentiment Analysis") {
                     for (comment in comments) {
                         //Get the token of each comment
                         val commentText = comment.text
-                        val token = tokenizerService?.commentTokenizer(commentText)
+                        val token = tokenizerService.commentTokenizer(commentText)
 
                         runBlocking {
-                            val prediction = token?.let { analyzerService.sentimentAnalysis(it) }
+                            val prediction = token.let { analyzerService.sentimentAnalysis(it) }
                             commentSentimentMap[comment] = prediction
                             thisLogger().info(" The prediction of comment ${comment.text} is $prediction")
                         }
@@ -54,7 +54,7 @@ class SentimentAnalysisAction() : AnAction("Perform Sentiment Analysis") {
 
                 // Update the sentiment analysis result mapping to the table content
                 e.project?.let { MapParser.updateComSenMap(commentSentimentMap) }
-                val tableModel = e.project?.let { loader?.tableLoader(commentSentimentMap, it) }
+                val tableModel = e.project?.let { loader.tableLoader(commentSentimentMap, it) }
                 fileTableMap[file.name] = tableModel
             }
             // Update table content

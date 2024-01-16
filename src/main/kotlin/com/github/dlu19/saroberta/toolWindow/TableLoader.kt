@@ -6,7 +6,6 @@ import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.table.JBTable
-
 import javax.swing.table.DefaultTableModel
 
 

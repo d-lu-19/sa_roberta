@@ -1,8 +1,10 @@
 package com.github.dlu19.saroberta.robertaTokenizer
 
-import com.genesys.roberta.tokenizer.BiGram
-
 /**
+ * This file contains code based on RoBERTa Java Tokenizer
+ * Source: https://github.com/purecloudlabs/roberta-tokenizer
+
+
  * Byte-Pair-Encoding
  * Relies on a pre-tokenizer that splits the training data into words, in our case space.
  *

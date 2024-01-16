@@ -1,6 +1,6 @@
 package com.github.dlu19.saroberta
 
-import com.genesys.roberta.tokenizer.BiGram
+import com.github.dlu19.saroberta.robertaTokenizer.BiGram
 import com.github.dlu19.saroberta.robertaTokenizer.RobertaTokenizer
 import com.github.dlu19.saroberta.robertaTokenizer.RobertaTokenizerResources
 import com.intellij.testFramework.TestDataPath

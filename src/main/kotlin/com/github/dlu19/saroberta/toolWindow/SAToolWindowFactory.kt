@@ -3,7 +3,6 @@ package com.github.dlu19.saroberta.toolWindow
 import com.github.dlu19.saroberta.listeners.FileSelectionListener
 import com.github.dlu19.saroberta.listeners.FileTableMapListener
 import com.github.dlu19.saroberta.services.MapParser
-import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
@@ -30,7 +29,7 @@ class SAToolWindowFactory : ToolWindowFactory, FileTableMapListener {
         this.loaderService = Loader()
         this.tabbedPane = JBTabbedPane()
 
-        MapParser.setListener(this)
+        MapParser.setFileTableListener(this)
 
         val panel = createToolWindowPanel(project)
         val contentFactory = ContentFactory.getInstance()
